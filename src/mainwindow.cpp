@@ -6,7 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
 	ui(new Ui::MainWindow)
 {
 	ui->setupUi(this);
-	this->setWindowTitle("æ•°å­—å­ªç”Ÿå®¢æˆ·ç«¯");
+	this->setWindowTitle("Êı×ÖÂÏÉú¼ì²â¶Ë");
 	memset(&m_stDevList, 0, sizeof(MV_CC_DEVICE_INFO_LIST));
 	m_pcMyCamera = NULL;
 	m_bGrabbing = false;
@@ -49,7 +49,7 @@ MainWindow::~MainWindow()
 void MainWindow::initTable()
 {
 	ui->image_result_tableview->setEditTriggers(QAbstractItemView::NoEditTriggers);
-	model.setHorizontalHeaderLabels({ "å­—æ¯", "æ—‹è½¬è§’åº¦", "Xè½´åæ ‡", "Yè½´åæ ‡" });
+	model.setHorizontalHeaderLabels({ "×Ö·û", "Ğı×ª½Ç¶È", "XÖá×ø±ê", "YÖá×ø±ê" });
 	model.setItem(0, 0, new QStandardItem());
 	ui->image_result_tableview->setModel(&model);
 }
@@ -95,7 +95,7 @@ void MainWindow::connectTcpMessagerSignals()
 	connect(this, &MainWindow::stopListening, tcp_messager, &Tcp_Messager::stopListening);
 
 	connect(tcp_messager, &Tcp_Messager::listening, this, [&] {
-		ui->listen_pushButton->setText("ç›‘å¬ä¸­...");
+		ui->listen_pushButton->setText("¼àÌıÖĞ...");
 		ui->listen_pushButton->setStyleSheet("QPushButton{"
 			"background-color: rgb(38, 162, 105);}"
 			"QPushButton:hover{"
@@ -105,7 +105,7 @@ void MainWindow::connectTcpMessagerSignals()
 		});
 
 	connect(tcp_messager, &Tcp_Messager::notListening, this, [&] {
-		ui->listen_pushButton->setText("ç›‘å¬");
+		ui->listen_pushButton->setText("¼àÌı");
 		ui->listen_pushButton->setStyleSheet("QPushButton{"
 			"background-color: rgb(165, 29, 45);}"
 			"QPushButton:hover{"
@@ -116,25 +116,25 @@ void MainWindow::connectTcpMessagerSignals()
 
 	connect(tcp_messager, &Tcp_Messager::connected, this, [&](QHostAddress address) {
 		ui->client_state_label->setStyleSheet("QLabel{color: rgb(38, 162, 105);}");
-		QString text = address.toString() + "å·²è¿æ¥";
+		QString text = address.toString() + "ÒÑÁ¬½Ó";
 		ui->client_state_label->setText(text);
 		});
 
 	connect(tcp_messager, &Tcp_Messager::disconnected, this, [&] {
 		ui->client_state_label->setStyleSheet("QLabel{color: rgb(224, 27, 36);}");
-		QString text = "æœªè¿æ¥";
+		QString text = "Î´Á¬½Ó";
 		ui->client_state_label->setText(text);
 		});
 
 	connect(tcp_messager, &Tcp_Messager::sendMsg, this, [&](QString msg) {
 		ui->msg_textEdit->setTextColor(QColor(255, 45, 4));
-		ui->msg_textEdit->append(msg + ((msg != "Stop") ? " (ä½ç½®ä¿¡æ¯)" : "(åœæ­¢ä¿¡å·)"));
+		ui->msg_textEdit->append(msg + ((msg != "Stop") ? " (Î»ÖÃĞÅÏ¢)" : "(Í£Ö¹ĞÅºÅ)"));
 		ui->msg_textEdit->moveCursor(QTextCursor::End);
 		});
 
 	connect(tcp_messager, &Tcp_Messager::recivedMsg, this, [&](QString msg) {
 		ui->msg_textEdit->setTextColor(QColor(6, 173, 88));
-		ui->msg_textEdit->append(msg + " (å›åº”ä¿¡æ¯)");
+		ui->msg_textEdit->append(msg + " (»ØÓ¦ĞÅÏ¢)");
 		ui->msg_textEdit->moveCursor(QTextCursor::End);
 		});
 
@@ -193,14 +193,15 @@ void MainWindow::ImageCallBackInner(unsigned char * pData, MV_FRAME_OUT_INFO_EX*
 	unsigned char * conv_pData = (unsigned char *)malloc(pFrameInfo->nWidth * pFrameInfo->nHeight * 3 + 2048);
 
 	memset(&stConvertParam, 0, sizeof(MV_CC_PIXEL_CONVERT_PARAM));
-	stConvertParam.nWidth = pFrameInfo->nWidth;                 
-	stConvertParam.nHeight = pFrameInfo->nHeight;             
-	stConvertParam.pSrcData = pData;                  
-	stConvertParam.nSrcDataLen = pFrameInfo->nFrameLen;         
-	stConvertParam.enSrcPixelType = pFrameInfo->enPixelType;    
-	stConvertParam.enDstPixelType = PixelType_Gvsp_BGR8_Packed; 
-	stConvertParam.pDstBuffer = conv_pData;                    
-	stConvertParam.nDstBufferSize = (pFrameInfo->nWidth * pFrameInfo->nHeight * 3 + 2048);
+	stConvertParam.nWidth = pFrameInfo->nWidth;                 //ch:Í¼Ïñ¿í | en:image width
+	stConvertParam.nHeight = pFrameInfo->nHeight;               //ch:Í¼Ïñ¸ß | en:image height
+	stConvertParam.pSrcData = pData;                  //ch:ÊäÈëÊı¾İ»º´æ | en:input data buffer
+	stConvertParam.nSrcDataLen = pFrameInfo->nFrameLen;         //ch:ÊäÈëÊı¾İ´óĞ¡ | en:input data size
+	stConvertParam.enSrcPixelType = pFrameInfo->enPixelType;    //ch:ÊäÈëÏñËØ¸ñÊ½ | en:input pixel format
+	stConvertParam.enDstPixelType = PixelType_Gvsp_BGR8_Packed; //ch:Êä³öÏñËØ¸ñÊ½ | en:output pixel format  ÊÊÓÃÓÚOPENCVµÄÍ¼Ïñ¸ñÊ½
+	//stConvertParam.enDstPixelType = PixelType_Gvsp_RGB8_Packed; //ch:Êä³öÏñËØ¸ñÊ½ | en:output pixel format
+	stConvertParam.pDstBuffer = conv_pData;                    //ch:Êä³öÊı¾İ»º´æ | en:output data buffer
+	stConvertParam.nDstBufferSize = (pFrameInfo->nWidth * pFrameInfo->nHeight * 3 + 2048);            //ch:Êä³ö»º´æ´óĞ¡ | en:output buffer size
 	MV_CC_ConvertPixelType(handle, &stConvertParam);
 	cv::Mat mat = cv::Mat(pFrameInfo->nHeight, pFrameInfo->nWidth, CV_8UC3, conv_pData);
 	image_processer.processImage(mat, display_origin);
@@ -239,7 +240,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
 	if (m_pcMyCamera != NULL)
 	{
-		auto ret = QMessageBox::warning(NULL, "è­¦å‘Š", "ç›¸æœºæœªå…³é—­ï¼Œæ˜¯å¦ä»è¦å…³é—­?", QMessageBox::Yes, QMessageBox::No);
+		auto ret = QMessageBox::warning(NULL, "¾¯¸æ", "ÏàÏñ»úÎ´¹Ø±Õ£¬ÊÇ·ñÈÔÒª¹Ø±Õ?", QMessageBox::Yes, QMessageBox::No);
 		if (ret == QMessageBox::No)
 		{
 			event->ignore();
@@ -259,7 +260,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::choseFile()
 {
-	QString calib_data_file = QFileDialog::getOpenFileName(this, QString("é€‰æ‹©æ–‡ä»¶"), "", "Calibration info (*.calib)");
+	QString calib_data_file = QFileDialog::getOpenFileName(this, QString("Ñ¡ÔñÎÄ¼ş"), "", "Calibration info (*.calib)");
 	if (calib_data_file == "") return;
 	else
 	{
@@ -311,7 +312,7 @@ void MainWindow::on_send_msg_pushButton_clicked()
 
 void MainWindow::on_listen_pushButton_clicked()
 {
-	if (ui->listen_pushButton->text() == "ç›‘å¬")
+	if (ui->listen_pushButton->text() == "¼àÌı")
 	{
 		tcp_thread.start();
 		QString ip = ui->ip_lineEdit->text();
@@ -329,6 +330,7 @@ void MainWindow::on_search_button_clicked()
 {
 	ui->device_list->clear();
 
+	// ch:Ã¶¾Ù×ÓÍøÄÚËùÓĞÉè±¸ | en:Enumerate all devices within subnet
 	memset(&m_stDevList, 0, sizeof(MV_CC_DEVICE_INFO_LIST));
 	int nRet = CMvCamera::EnumDevices(MV_GIGE_DEVICE | MV_USB_DEVICE, &m_stDevList);
 	if (MV_OK != nRet)
@@ -336,6 +338,7 @@ void MainWindow::on_search_button_clicked()
 		return;
 	}
 
+	// ch:½«Öµ¼ÓÈëµ½ĞÅÏ¢ÁĞ±í¿òÖĞ²¢ÏÔÊ¾³öÀ´ | en:Add value to the information list box and display
 	for (unsigned int i = 0; i < m_stDevList.nDeviceNum; i++)
 	{
 		QString strMsg;
@@ -399,6 +402,7 @@ void MainWindow::on_open_device_button_clicked()
 		return;
 	}
 
+	// ch:ÓÉÉè±¸ĞÅÏ¢´´½¨Éè±¸ÊµÀı | en:Device instance created by device information
 	if (NULL == m_stDevList.pDeviceInfo[nIndex])
 	{
 		ShowErrorMsg("Device does not exist", 0);
@@ -433,6 +437,7 @@ void MainWindow::on_open_device_button_clicked()
 		ShowErrorMsg("Open Fail", nRet);
 		return;
 	}
+	// ch:Ì½²âÍøÂç×î¼Ñ°ü´óĞ¡(Ö»¶ÔGigEÏà»úÓĞĞ§) | en:Detection network optimal package size(It only works for the GigE camera)
 	if (m_stDevList.pDeviceInfo[nIndex]->nTLayerType == MV_GIGE_DEVICE)
 	{
 		unsigned int nPacketSize = 0;
@@ -481,7 +486,7 @@ void MainWindow::on_start_button_clicked()
 
 	if (calib_params.empty() || calib_params.size() != 6)
 	{
-		QMessageBox::warning(nullptr, "è­¦å‘Š", "æ ‡å®šæ•°æ®æœªå¯¼å…¥æˆ–å¯¼å…¥æ•°æ®é”™è¯¯", QMessageBox::Ok);
+		QMessageBox::information(nullptr, "ÌáÊ¾", "Î´µ¼Èë±ê¶¨Êı¾İ»òµ¼ÈëÊı¾İ²»ÕıÈ·", QMessageBox::Ok);
 		return;
 	}
 	m_pcMyCamera->RegisterImageCallBack(ImageCallBack, this);
